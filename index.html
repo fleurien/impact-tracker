@@ -1,253 +1,328 @@
-import React, { useState } from 'react';
-import { Plus, Trash2, Download, TrendingUp, Users, Clock, DollarSign, Target } from 'lucide-react';
-
-const ImpactTracker = () => {
-  const [impacts, setImpacts] = useState([
-    {
-      id: 1,
-      date: '2024-09',
-      project: 'Import Tool Documentation & Training',
-      category: 'enablement',
-      description: 'Created documentation and trained launch team on internal importing tool',
-      metrics: 'Reduced import requests to tech consultants by ~40%, saving 8-10 hours/week',
-      businessValue: 'Enabled launch team to handle 5+ additional implementations per month without additional headcount',
-      skills: 'Technical writing, training delivery, process improvement'
-    }
-  ]);
-
-  const [newImpact, setNewImpact] = useState({
-    date: '',
-    project: '',
-    category: 'technical',
-    description: '',
-    metrics: '',
-    businessValue: '',
-    skills: ''
-  });
-
-  const categories = {
-    technical: { label: 'Technical Problem-Solving', icon: Target, color: 'bg-blue-100 text-blue-700' },
-    enablement: { label: 'Training & Enablement', icon: Users, color: 'bg-green-100 text-green-700' },
-    process: { label: 'Process Improvement', icon: TrendingUp, color: 'bg-purple-100 text-purple-700' },
-    efficiency: { label: 'Time/Cost Savings', icon: Clock, color: 'bg-orange-100 text-orange-700' },
-    revenue: { label: 'Revenue Impact', icon: DollarSign, color: 'bg-emerald-100 text-emerald-700' }
-  };
-
-  const addImpact = () => {
-    if (newImpact.project && newImpact.description) {
-      setImpacts([...impacts, { ...newImpact, id: Date.now() }]);
-      setNewImpact({
-        date: '',
-        project: '',
-        category: 'technical',
-        description: '',
-        metrics: '',
-        businessValue: '',
-        skills: ''
-      });
-    }
-  };
-
-  const deleteImpact = (id) => {
-    setImpacts(impacts.filter(i => i.id !== id));
-  };
-
-  const exportData = () => {
-    const text = impacts.map(i => 
-      `${i.date} - ${i.project}\n` +
-      `Category: ${categories[i.category].label}\n` +
-      `Description: ${i.description}\n` +
-      `Metrics: ${i.metrics}\n` +
-      `Business Value: ${i.businessValue}\n` +
-      `Skills Used: ${i.skills}\n` +
-      `---\n`
-    ).join('\n');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Impact Tracker</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
     
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'career-impact-log.txt';
-    a.click();
-  };
+    <script type="text/babel">
+        const { useState } = React;
 
-  return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Career Impact Tracker</h1>
-        <p className="text-gray-600">Document your wins, quantify your value, and build your career story.</p>
-      </div>
+        // Lucide React icons as inline SVGs
+        const PlusIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+        );
 
-      {/* Add New Impact */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-          <Plus className="w-5 h-5" />
-          Add New Impact
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date (YYYY-MM)</label>
-            <input
-              type="text"
-              placeholder="2024-10"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={newImpact.date}
-              onChange={(e) => setNewImpact({...newImpact, date: e.target.value})}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={newImpact.category}
-              onChange={(e) => setNewImpact({...newImpact, category: e.target.value})}
-            >
-              {Object.entries(categories).map(([key, val]) => (
-                <option key={key} value={key}>{val.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Project/Initiative Name</label>
-            <input
-              type="text"
-              placeholder="e.g., Jira Heat Map Creation"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={newImpact.project}
-              onChange={(e) => setNewImpact({...newImpact, project: e.target.value})}
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">What You Did</label>
-            <textarea
-              placeholder="Describe the action you took..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              rows="2"
-              value={newImpact.description}
-              onChange={(e) => setNewImpact({...newImpact, description: e.target.value})}
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Quantifiable Metrics</label>
-            <textarea
-              placeholder="e.g., Reduced tickets by 25%, saved 10 hours/week, trained 8 team members..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              rows="2"
-              value={newImpact.metrics}
-              onChange={(e) => setNewImpact({...newImpact, metrics: e.target.value})}
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Business Value / Impact</label>
-            <textarea
-              placeholder="Why it mattered to the company: prevented churn, enabled scaling, improved customer satisfaction..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              rows="2"
-              value={newImpact.businessValue}
-              onChange={(e) => setNewImpact({...newImpact, businessValue: e.target.value})}
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Skills Demonstrated</label>
-            <input
-              type="text"
-              placeholder="e.g., Data analysis, stakeholder management, SQL, technical writing..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              value={newImpact.skills}
-              onChange={(e) => setNewImpact({...newImpact, skills: e.target.value})}
-            />
-          </div>
-        </div>
-        <button
-          onClick={addImpact}
-          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          Add Impact
-        </button>
-      </div>
+        const TrashIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+        );
 
-      {/* Impact List */}
-      <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Your Impact Log ({impacts.length})</h2>
-        <button
-          onClick={exportData}
-          className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center gap-2"
-        >
-          <Download className="w-4 h-4" />
-          Export
-        </button>
-      </div>
+        const DownloadIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+        );
 
-      <div className="space-y-4">
-        {impacts.map(impact => {
-          const CategoryIcon = categories[impact.category].icon;
-          return (
-            <div key={impact.id} className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-start gap-3 flex-1">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${categories[impact.category].color}`}>
-                    <CategoryIcon className="w-4 h-4" />
-                    {categories[impact.category].label}
-                  </span>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-gray-800">{impact.project}</h3>
-                    <p className="text-sm text-gray-500">{impact.date}</p>
-                  </div>
+        const TargetIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="6"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+            </svg>
+        );
+
+        const UsersIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+        );
+
+        const TrendingUpIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+        );
+
+        const ClockIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+        );
+
+        const DollarSignIcon = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+        );
+
+        const ImpactTracker = () => {
+            const [impacts, setImpacts] = useState([
+                {
+                    id: 1,
+                    date: '2024-09',
+                    project: 'Import Tool Documentation & Training',
+                    category: 'enablement',
+                    description: 'Created documentation and trained launch team on internal importing tool',
+                    metrics: 'Reduced import requests to tech consultants by ~40%, saving 8-10 hours/week',
+                    businessValue: 'Enabled launch team to handle 5+ additional implementations per month without additional headcount',
+                    skills: 'Technical writing, training delivery, process improvement'
+                }
+            ]);
+
+            const [newImpact, setNewImpact] = useState({
+                date: '',
+                project: '',
+                category: 'technical',
+                description: '',
+                metrics: '',
+                businessValue: '',
+                skills: ''
+            });
+
+            const categories = {
+                technical: { label: 'Technical Problem-Solving', icon: TargetIcon, color: 'bg-blue-100 text-blue-700' },
+                enablement: { label: 'Training & Enablement', icon: UsersIcon, color: 'bg-green-100 text-green-700' },
+                process: { label: 'Process Improvement', icon: TrendingUpIcon, color: 'bg-purple-100 text-purple-700' },
+                efficiency: { label: 'Time/Cost Savings', icon: ClockIcon, color: 'bg-orange-100 text-orange-700' },
+                revenue: { label: 'Revenue Impact', icon: DollarSignIcon, color: 'bg-emerald-100 text-emerald-700' }
+            };
+
+            const addImpact = () => {
+                if (newImpact.project && newImpact.description) {
+                    setImpacts([...impacts, { ...newImpact, id: Date.now() }]);
+                    setNewImpact({
+                        date: '',
+                        project: '',
+                        category: 'technical',
+                        description: '',
+                        metrics: '',
+                        businessValue: '',
+                        skills: ''
+                    });
+                }
+            };
+
+            const deleteImpact = (id) => {
+                setImpacts(impacts.filter(i => i.id !== id));
+            };
+
+            const exportData = () => {
+                const text = impacts.map(i => 
+                    `${i.date} - ${i.project}\n` +
+                    `Category: ${categories[i.category].label}\n` +
+                    `Description: ${i.description}\n` +
+                    `Metrics: ${i.metrics}\n` +
+                    `Business Value: ${i.businessValue}\n` +
+                    `Skills Used: ${i.skills}\n` +
+                    `---\n`
+                ).join('\n');
+                
+                const blob = new Blob([text], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'career-impact-log.txt';
+                a.click();
+            };
+
+            return (
+                <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800 mb-2">Career Impact Tracker</h1>
+                        <p className="text-gray-600">Document your wins, quantify your value, and build your career story.</p>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                            <PlusIcon />
+                            Add New Impact
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Date (YYYY-MM)</label>
+                                <input
+                                    type="text"
+                                    placeholder="2024-10"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    value={newImpact.date}
+                                    onChange={(e) => setNewImpact({...newImpact, date: e.target.value})}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                <select
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    value={newImpact.category}
+                                    onChange={(e) => setNewImpact({...newImpact, category: e.target.value})}
+                                >
+                                    {Object.entries(categories).map(([key, val]) => (
+                                        <option key={key} value={key}>{val.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Project/Initiative Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g., Jira Heat Map Creation"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    value={newImpact.project}
+                                    onChange={(e) => setNewImpact({...newImpact, project: e.target.value})}
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">What You Did</label>
+                                <textarea
+                                    placeholder="Describe the action you took..."
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    rows="2"
+                                    value={newImpact.description}
+                                    onChange={(e) => setNewImpact({...newImpact, description: e.target.value})}
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Quantifiable Metrics</label>
+                                <textarea
+                                    placeholder="e.g., Reduced tickets by 25%, saved 10 hours/week, trained 8 team members..."
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    rows="2"
+                                    value={newImpact.metrics}
+                                    onChange={(e) => setNewImpact({...newImpact, metrics: e.target.value})}
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Business Value / Impact</label>
+                                <textarea
+                                    placeholder="Why it mattered to the company: prevented churn, enabled scaling, improved customer satisfaction..."
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    rows="2"
+                                    value={newImpact.businessValue}
+                                    onChange={(e) => setNewImpact({...newImpact, businessValue: e.target.value})}
+                                />
+                            </div>
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Skills Demonstrated</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g., Data analysis, stakeholder management, SQL, technical writing..."
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                    value={newImpact.skills}
+                                    onChange={(e) => setNewImpact({...newImpact, skills: e.target.value})}
+                                />
+                            </div>
+                        </div>
+                        <button
+                            onClick={addImpact}
+                            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
+                        >
+                            <PlusIcon />
+                            Add Impact
+                        </button>
+                    </div>
+
+                    <div className="mb-6 flex justify-between items-center">
+                        <h2 className="text-xl font-semibold">Your Impact Log ({impacts.length})</h2>
+                        <button
+                            onClick={exportData}
+                            className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 flex items-center gap-2"
+                        >
+                            <DownloadIcon />
+                            Export
+                        </button>
+                    </div>
+
+                    <div className="space-y-4">
+                        {impacts.map(impact => {
+                            const CategoryIcon = categories[impact.category].icon;
+                            return (
+                                <div key={impact.id} className="bg-white rounded-lg shadow-md p-6">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <div className="flex items-start gap-3 flex-1">
+                                            <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${categories[impact.category].color}`}>
+                                                <CategoryIcon />
+                                                {categories[impact.category].label}
+                                            </span>
+                                            <div className="flex-1">
+                                                <h3 className="font-semibold text-lg text-gray-800">{impact.project}</h3>
+                                                <p className="text-sm text-gray-500">{impact.date}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => deleteImpact(impact.id)}
+                                            className="text-red-500 hover:text-red-700 p-1"
+                                        >
+                                            <TrashIcon />
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="space-y-3">
+                                        <div>
+                                            <p className="text-sm font-medium text-gray-700 mb-1">What You Did:</p>
+                                            <p className="text-gray-600">{impact.description}</p>
+                                        </div>
+                                        
+                                        {impact.metrics && (
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-700 mb-1">Metrics:</p>
+                                                <p className="text-gray-600">{impact.metrics}</p>
+                                            </div>
+                                        )}
+                                        
+                                        {impact.businessValue && (
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-700 mb-1">Business Value:</p>
+                                                <p className="text-gray-600">{impact.businessValue}</p>
+                                            </div>
+                                        )}
+                                        
+                                        {impact.skills && (
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-700 mb-1">Skills:</p>
+                                                <p className="text-gray-600 text-sm">{impact.skills}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                        <h3 className="font-semibold text-blue-900 mb-3">💡 Tips for Tracking Impact</h3>
+                        <ul className="space-y-2 text-sm text-blue-800">
+                            <li><strong>Track as you go:</strong> Add entries right after completing something notable - don't wait!</li>
+                            <li><strong>Even estimates count:</strong> "Approximately 10 hours saved" is better than no number at all</li>
+                            <li><strong>Think "so what?":</strong> Always connect your action to why it mattered to the business</li>
+                            <li><strong>Use your tracker for:</strong> Performance reviews, resume updates, interview prep, or salary discussions</li>
+                            <li><strong>Review quarterly:</strong> Look for patterns in what you excel at and what brings value</li>
+                        </ul>
+                    </div>
                 </div>
-                <button
-                  onClick={() => deleteImpact(impact.id)}
-                  className="text-red-500 hover:text-red-700 p-1"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-1">What You Did:</p>
-                  <p className="text-gray-600">{impact.description}</p>
-                </div>
-                
-                {impact.metrics && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-1">Metrics:</p>
-                    <p className="text-gray-600">{impact.metrics}</p>
-                  </div>
-                )}
-                
-                {impact.businessValue && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-1">Business Value:</p>
-                    <p className="text-gray-600">{impact.businessValue}</p>
-                  </div>
-                )}
-                
-                {impact.skills && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700 mb-1">Skills:</p>
-                    <p className="text-gray-600 text-sm">{impact.skills}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+        };
 
-      {/* Tips Section */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="font-semibold text-blue-900 mb-3">💡 Tips for Tracking Impact</h3>
-        <ul className="space-y-2 text-sm text-blue-800">
-          <li><strong>Track as you go:</strong> Add entries right after completing something notable - don't wait!</li>
-          <li><strong>Even estimates count:</strong> "Approximately 10 hours saved" is better than no number at all</li>
-          <li><strong>Think "so what?":</strong> Always connect your action to why it mattered to the business</li>
-          <li><strong>Use your tracker for:</strong> Performance reviews, resume updates, interview prep, or salary discussions</li>
-          <li><strong>Review quarterly:</strong> Look for patterns in what you excel at and what brings value</li>
-        </ul>
-      </div>
-    </div>
-  );
-};
-
-export default ImpactTracker;
+        ReactDOM.render(<ImpactTracker />, document.getElementById('root'));
+    </script>
+</body>
+</html>
