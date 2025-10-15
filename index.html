@@ -236,18 +236,41 @@
             };
 
             const exportToPDF = () => {
+                if (typeof html2pdf === 'undefined') {
+                    alert('PDF library is still loading. Please wait a moment and try again.');
+                    return;
+                }
+                
                 const element = pdfRef.current;
+                
+                // Clone the element to avoid modifying the display
+                const clone = element.cloneNode(true);
+                
+                // Remove delete buttons from clone
+                const buttons = clone.querySelectorAll('button');
+                buttons.forEach(btn => btn.remove());
+                
                 const opt = {
                     margin: 0.5,
                     filename: `career-impact-portfolio-${new Date().toISOString().split('T')[0]}.pdf`,
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true,
+                        logging: false,
+                        backgroundColor: '#f9fafb'
+                    },
                     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
                 };
                 
                 setSaveMessage('⏳ Generating PDF...');
-                html2pdf().set(opt).from(element).save().then(() => {
+                
+                html2pdf().set(opt).from(clone).save().then(() => {
                     setSaveMessage('✓ PDF downloaded!');
+                    setTimeout(() => setSaveMessage(''), 3000);
+                }).catch(err => {
+                    console.error('PDF generation error:', err);
+                    setSaveMessage('❌ PDF generation failed');
                     setTimeout(() => setSaveMessage(''), 3000);
                 });
             };
